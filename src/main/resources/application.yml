@@ -1,0 +1,21 @@
+security:
+  jwt:
+    expirationTime: 3600000
+    secretKey: thisIsAProjectForManageYourExpensesThatItsNameIsExpenseTracker
+spring:
+  application:
+    name: expense-tracker
+  datasource:
+    driverClassName: org.h2.Driver
+    password: sa
+    url: jdbc:h2:mem:expense-tracker-db
+    username: sa
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+server:
+  port: 8020
