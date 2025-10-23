@@ -1,6 +1,11 @@
 package com.fathi.expense.tracker.security;
 
+import com.fathi.expense.tracker.component.exception.ExpiredTokenException;
+import com.fathi.expense.tracker.component.exception.InvalidTokenException;
 import com.fathi.expense.tracker.service.UserDetailServiceImpl;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,23 +32,35 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        String authorizationHeader = request.getHeader("Authorization");
-        if (isValidAuthorizationHeader(authorizationHeader)) {
-            String token = authorizationHeader.substring(TOKEN_PREFIX.length());
-            String username = jwtUtils.extractUsername(token);
-            if (usernameIsPresent(username)) {
-                UserDetails userDetails = userDetailService.loadUserByUsername(username);
-                if (jwtUtils.validateToken(token, userDetails)) {
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities());
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
+
+        if(request.getServletPath().startsWith("/auth")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        try {
+            String authorizationHeader = request.getHeader("Authorization");
+            if (isValidAuthorizationHeader(authorizationHeader)) {
+                String token = authorizationHeader.substring(TOKEN_PREFIX.length());
+                String username = jwtUtils.extractUsername(token);
+                if (usernameIsPresent(username)) {
+                    UserDetails userDetails = userDetailService.loadUserByUsername(username);
+                    if (jwtUtils.validateToken(token, userDetails)) {
+                        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities());
+                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                    }
                 }
             }
+            filterChain.doFilter(request, response);
+        } catch (ExpiredJwtException exception) {
+            throw new ExpiredTokenException("error.token.expired");
+        } catch (MalformedJwtException | SignatureException | IllegalArgumentException exception) {
+            throw new InvalidTokenException("error.token.invalid");
         }
-        filterChain.doFilter(request, response);
     }
 
     private boolean usernameIsPresent(String username) {

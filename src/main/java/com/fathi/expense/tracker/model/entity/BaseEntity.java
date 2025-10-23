@@ -2,16 +2,27 @@ package com.fathi.expense.tracker.model.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.CreationTimestamp;
 
-@Entity
+import java.time.LocalDateTime;
+
+
 @Getter
 @Setter
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public class BaseEntity {
+@SuperBuilder
+@MappedSuperclass
+@NoArgsConstructor
+public class BaseEntity extends SimpleEntity{
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+    private Long version;
+    private Long creatorId;
+    private Long lastModifierId;
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+    @CreationTimestamp
+    private LocalDateTime updatedAt;
 
 }

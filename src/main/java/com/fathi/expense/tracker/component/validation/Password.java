@@ -1,4 +1,4 @@
-package com.fathi.expense.tracker.validation;
+package com.fathi.expense.tracker.component.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

@@ -27,7 +27,7 @@ public class JWTUtils {
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {
-        return isValidTokenUsername(token, userDetails) && isExpiredToken(token);
+        return isValidTokenUsername(userDetails) && isExpiredToken(token);
     }
 
     public Date extractExpirsionDate(String token) {
@@ -48,7 +48,7 @@ public class JWTUtils {
                 .getSubject();
     }
 
-    private boolean isValidTokenUsername(String token, UserDetails userDetails) {
+    private boolean isValidTokenUsername(UserDetails userDetails) {
         return extractUsername(userDetails.getUsername()).equals(userDetails.getUsername());
     }
 

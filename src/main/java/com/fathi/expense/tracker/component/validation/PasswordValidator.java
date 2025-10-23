@@ -1,11 +1,11 @@
-package com.fathi.expense.tracker.validation;
+package com.fathi.expense.tracker.component.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 public class PasswordValidator implements ConstraintValidator<Password, String> {
 
-    private static final String PASSWORD_REGEX = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d@$!%*?&^#._-]{8}$";
+    private static final String PASSWORD_REGEX = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&^#._-])[A-Za-z\\d@$!%*?&^#._-]{8,}$";
 
     @Override
     public boolean isValid(String password, ConstraintValidatorContext context) {

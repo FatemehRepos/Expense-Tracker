@@ -1,22 +1,26 @@
 package com.fathi.expense.tracker.model.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
+
+import java.util.List;
 
 @Entity
 @Setter
 @Getter
-@Builder
-@Table(name = "app_user")
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "app_user")
 public class User extends BaseEntity {
 
     @Column(unique = true, nullable = false)
     private String username;
     @Column(nullable = false)
     private String password;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
+    private List<UserRoles> UserRole;
 
 }
