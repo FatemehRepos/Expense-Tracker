@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 public class JwtConfig {
 
     private String secretKey = "";
-    private long expirationTime = 0L;
+    private int expirationMinutes = 0;
+    private int refreshTokenExpirationDay = 1;
 
 }

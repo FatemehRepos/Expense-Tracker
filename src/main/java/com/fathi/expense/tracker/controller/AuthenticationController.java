@@ -1,19 +1,18 @@
 package com.fathi.expense.tracker.controller;
 
+import com.fathi.expense.tracker.model.entity.User;
 import com.fathi.expense.tracker.model.request.AuthenticationRequest;
+import com.fathi.expense.tracker.model.request.RefreshTokenRequest;
 import com.fathi.expense.tracker.model.response.AuthenticationResponse;
-import com.fathi.expense.tracker.model.response.UserResponse;
-import com.fathi.expense.tracker.security.JWTUtils;
-import com.fathi.expense.tracker.service.UserService;
+import com.fathi.expense.tracker.model.response.Response;
+import com.fathi.expense.tracker.model.response.UserCreationResponse;
+import com.fathi.expense.tracker.service.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,29 +23,35 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 public class AuthenticationController {
 
-    private final JWTUtils jwtUtils;
-    private final UserService userService;
-    private final UserDetailsService userDetailService;
+    private final AuthenticationService authenticationService;
     private final AuthenticationManager authenticationManager;
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> register(@RequestBody @Valid AuthenticationRequest request) {
+    public ResponseEntity<Response<UserCreationResponse>> register(@RequestBody @Valid AuthenticationRequest request) {
+        User user = authenticationService.register(request.username(), request.password());
+        UserCreationResponse response = UserCreationResponse.builder().id(user.getId()).build();
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(userService.save(request));
+                .body(Response.success(response));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody AuthenticationRequest request) {
+    public ResponseEntity<Response<AuthenticationResponse>> login(@RequestBody AuthenticationRequest request) {
         initialAuthenticate(request.username(), request.password());
-        UserDetails userDetails = userDetailService.loadUserByUsername(request.username());
-        String token = jwtUtils.generateToken(userDetails);
-        AuthenticationResponse response = AuthenticationResponse.builder()
-                .accessToken(token)
-                .tokenType("Bearer")
-                .expireAt(jwtUtils.extractExpirsionDate(token))
-                .build();
-        return ResponseEntity.ok(response);
+        AuthenticationResponse response = authenticationService.login(request.username());
+        return ResponseEntity.ok(Response.success(response));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<Response<AuthenticationResponse>> refresh(@RequestBody RefreshTokenRequest request) {
+        AuthenticationResponse response = authenticationService.refresh(request.refreshToken());
+        return ResponseEntity.ok(Response.success(response));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Response<AuthenticationResponse>> logout(@RequestBody RefreshTokenRequest request) {
+        authenticationService.logout(request.refreshToken());
+        return ResponseEntity.ok(Response.success(null));
     }
 
     private void initialAuthenticate(String username, String password) {

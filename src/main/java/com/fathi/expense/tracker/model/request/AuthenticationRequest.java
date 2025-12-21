@@ -10,6 +10,7 @@ public record AuthenticationRequest(
         @NotBlank
         @Size(min = 8, message = "error.username.validation.failed")
         String username,
+        String email,
         @Password
         String password) {
 }

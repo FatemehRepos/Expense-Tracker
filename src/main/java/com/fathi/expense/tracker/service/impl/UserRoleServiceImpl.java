@@ -18,7 +18,7 @@ public class UserRoleServiceImpl implements UserRoleService {
     private final UserRoleRepository userRoleRepository;
 
     @Override
-    public UserRoles create(User user, String roleName) {
+    public UserRoles save(User user, String roleName) {
         Role role = roleService.find(roleName);
         return userRoleRepository.save(UserRolesMapper.mapToUserRoles(user, role));
     }

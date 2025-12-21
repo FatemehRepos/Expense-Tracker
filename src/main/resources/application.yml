@@ -3,11 +3,23 @@ logging:
     root: debug
 security:
   jwt:
-    expirationTime: 3600000
+    expirationMinutes: 600000
     secretKey: thisIsAProjectForManageYourExpensesThatItsNameIsExpenseTracker
+    refreshTokenExpirationDay: 1
 spring:
   application:
     name: expense-tracker
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: fatemehfathi409@gmail.com
+    password: 6565215241
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: true
+          auth: true
   datasource:
     driverClassName: org.h2.Driver
     password: sa

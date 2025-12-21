@@ -1,13 +1,17 @@
 package com.fathi.expense.tracker.service;
 
 import com.fathi.expense.tracker.model.entity.User;
-import com.fathi.expense.tracker.model.request.AuthenticationRequest;
-import com.fathi.expense.tracker.model.response.UserResponse;
 
 public interface UserService {
 
-    UserResponse save(AuthenticationRequest request);
+    User save(String username, String password);
+
+//    void update(String newPassword);
 
     User getAuthenticatedUser();
+
+    User getUserByUsername(String username);
+
+//    User getUserByEmail(String email);
 
 }
